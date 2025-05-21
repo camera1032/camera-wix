@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>เปิดกล้องถ่ายรูป</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 20px;
+    background: #f0f0f0;
+  }
+  video, canvas {
+    width: 320px;
+    height: 240px;
+    border: 2px solid #333;
+    border-radius: 8px;
+    background: black;
+  }
+  button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 6px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+  }
+  button:hover {
+    background-color: #0056b3;
+  }
+  #photo {
+    margin-top: 15px;
+    display: block;
+    max-width: 320px;
+    border: 2px solid #333;
+    border-radius: 8px;
+  }
+</style>
+</head>
+<body>
+
+<h2>เปิดกล้องถ่ายรูป</h2>
+<video id="video" autoplay playsinline></video><br />
+<button id="snap">ถ่ายรูป</button>
+<canvas id="canvas" style="display:none;"></canvas>
+<img id="photo" alt="ภาพถ่ายจะปรากฏที่นี่" />
+
+<script>
+  const video = document.getElementById('video');
+  const canvas = document.getElementById('canvas');
+  const photo = document.getElementById('photo');
+  const snap = document.getElementById('snap');
+
+  // ขออนุญาตใช้กล้อง
+  navigator.mediaDevices.getUserMedia({ video: true })
+    .then(stream => {
+      video.srcObject = stream;
+    })
+    .catch(err => {
+      alert('ไม่สามารถเปิดกล้องได้: ' + err);
+      console.error(err);
+    });
+
+  snap.addEventListener('click', () => {
+    const context = canvas.getContext('2d');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    // แสดงภาพถ่ายจาก canvas
+    photo.src = canvas.toDataURL('image/png');
+  });
+</script>
+
+</body>
+</html>
