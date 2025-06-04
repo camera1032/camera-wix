@@ -1,78 +1,1385 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>เปิดกล้องถ่ายรูป</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    text-align: center;
-    margin: 20px;
-    background: #f0f0f0;
+  <meta charset="UTF-8" />
+  <title>2 Player Tap Game with QR Scan</title>
+  <style>
+    /* Reset & base */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      text-align: center;
+      background: url('65662728_9548397.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+      height: 100vh;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    h1, h2, h3 {
+      font-weight: 800;
+      color: #FED201;
+      text-shadow: 0 0 10px #FED201, 0 0 20px #FED201;
+      margin-bottom: 12px;
+      letter-spacing: 1px; 
+    }
+
+    #qr-section, #photo-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      position: absolute;
+      top: 10%;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+
+    #qr-section h2, #photo-section h2 {
+      margin-bottom: 20px;
+    }
+
+    /* QR Reader - ขยายใหญ่ขึ้น */
+    #qr-reader {
+      width: 800px !important;
+      max-width: 95%;
+      margin: 0 auto;
+      border: 3px solid #FED201;
+      border-radius: 12px;
+      box-shadow: 0 0 15px #FED201aa;
+    }
+
+    #qr-reader__scan_region {
+      width: 100% !important;
+      height: 600px !important;
+    }
+
+    #qr-reader__scan_region video {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover;
+    }
+
+    #qr-reader__scan_region img {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover;
+    }
+
+    #qr-result {
+      font-size: 1.1rem;
+      color: #FED201;
+      min-height: 28px;
+      margin-top: 8px;
+      font-weight: 600;
+      text-shadow: 0 0 6px #FED201;
+    }
+
+    /* Video & canvas */
+    video, canvas {
+      max-width: 800px;
+      width: 95%;
+      border-radius: 14px;
+      box-shadow: 0 0 12px #FED201bb;
+      margin: 0 auto;
+      display: block;
+      background: #222;
+
+    }
+
+    /* Photo preview */
+    #photo {
+      margin: 0 auto;
+      display: block;
+      border-radius: 14px;
+      max-width: 800px;
+      width: 95%;
+      box-shadow: 0 0 20px #FED201cc;
+      background: #222;
+    }
+
+    /* Buttons */
+    button {
+      margin-top: 15px;
+      padding: 16px 36px;
+      font-size: 24px;
+      background: linear-gradient(45deg, #FED201, #ffd700);
+      border: none;
+      border-radius: 14px;
+      color: #111;
+      cursor: pointer;
+      font-weight: 800;
+      box-shadow: 0 0 20px #FED201cc;
+      transition: all 0.3s ease;
+      user-select: none;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    button:hover, button:focus {
+      background: linear-gradient(45deg, #ffd700, #FED201);
+      color: #000;
+      box-shadow: 0 0 30px #FED201ee;
+      transform: translateY(-2px);
+      outline: none;
+    }
+    button:disabled {
+      background: #666;
+      cursor: not-allowed;
+      box-shadow: none;
+      color: #aaa;
+      transform: none;
+    }
+
+    /* Players info on game */
+    #players-info {
+      display: block;
+      justify-content: space-around;
+      margin-bottom: 40px;
+      color: #ddd;
+      gap: 30px;
+      flex-wrap: wrap;
+    }
+
+    #players-info > div {
+      padding: 20px;
+      border-radius: 16px;
+
+      transition: box-shadow 0.3s ease;
+    }
+    #players-info > div:hover {
+      box-shadow: 0 0 28px #FED201ee;
+    }
+
+    #players-info h3 {
+      margin-bottom: 10px;
+      color: #FED201;
+      text-shadow: 0 0 8px #FED201cc;
+    }
+    #players-info p {
+      font-size: 1.1rem;
+      margin: 8px 0;
+      word-break: break-word;
+    }
+  #players-info img {
+    width: 150px;           /* หรือกำหนดขนาดที่คุณต้องการ */
+    height: 150px;
+    border-radius: 50%;     /* ทำให้เป็นวงกลม */
+    background: #111;
   }
-  video, canvas {
-    width: 320px;
-    height: 240px;
-    border: 2px solid #333;
-    border-radius: 8px;
-    background: black;
-  }
-  button {
-    margin-top: 10px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 6px;
-    border: none;
-    background-color: #007bff;
-    color: white;
-  }
-  button:hover {
-    background-color: #0056b3;
-  }
-  #photo {
-    margin-top: 15px;
-    display: block;
-    max-width: 320px;
-    border: 2px solid #333;
-    border-radius: 8px;
-  }
-</style>
+
+
+    /* Game Section */
+    #game-section {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .game {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      height: 100vh;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      background: rgba(0, 0, 0, 0.8);
+      border-bottom: 3px solid #FED201;
+      box-shadow: 0 5px 30px rgba(254, 210, 1, 0.3);
+    }
+
+    .player-info {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .player-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 3px solid #FED201;
+      box-shadow: 0 0 20px rgba(254, 210, 1, 0.4);
+      object-fit: cover;
+    }
+
+    .player-details {
+      text-align: left;
+    }
+
+    .player-name {
+      font-size: 2rem;
+      font-weight: 900;
+      color: #FED201;
+      text-shadow: 0 0 20px rgba(254, 210, 1, 0.5);
+      margin-bottom: 5px;
+    }
+
+    .player-qr {
+      font-size: 1.2rem;
+      color: #fff;
+      opacity: 0.8;
+    }
+
+    .health-container {
+      width: 700px;
+    }
+
+    .health-bar {
+      background: rgba(51, 51, 51, 0.8);
+      height: 25px;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+      position: relative;
+
+    }
+
+    .health-fill {
+      height: 100%;
+      transition: width 0.3s ease;
+      border-radius: 15px 0 0 15px;
+    }
+
+    #healthA {
+      background: linear-gradient(90deg, #FED201, #ff6b6b);
+      box-shadow: 0 0 30px rgba(254, 210, 1, 0.4);
+    }
+
+    #healthB {
+      background: linear-gradient(90deg, #FED201, #4dabf7);
+      box-shadow: 0 0 30px rgba(254, 210, 1, 0.4);
+      border-radius: 15px 0 0 15px;
+    }
+
+    .health-value {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #fff;
+      font-weight: 700;
+      text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+    }
+
+    #timer {
+      font-size: 4rem;
+      font-weight: 900;
+      color: #FED201;
+      text-shadow: 0 0 30px rgba(254, 210, 1, 0.5);
+      letter-spacing: 8px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 10px 30px;
+      border-radius: 15px;
+      border: 3px solid #FED201;
+      box-shadow: 0 0 40px rgba(254, 210, 1, 0.3);
+    }
+
+    /* Arena Section */
+    .arena-section {
+      flex: 1;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+    }
+
+    .arena-frame {
+      position: relative;
+      width: 100%;
+      max-width: 1200px;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .arena-frame::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+    }
+
+    #arena-blue, #arena-red {
+      width: 800px;
+      height: 800px;
+      object-fit: cover;
+      transition: all 0.3s ease;
+    }
+
+    #arena-blue {
+      margin-right: -80px;
+    }
+
+    #arena-red {
+      margin-left: -80px;
+    }
+
+    /* Bottom Bar */
+    .bottom-bar {
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      border-top: 3px solid #FED201;
+      box-shadow: 0 -5px 30px rgba(254, 210, 1, 0.3);
+    }
+
+    #restartBtn {
+      font-size: 1.8rem;
+      padding: 15px 40px;
+      background: linear-gradient(45deg, #FED201, #ffd700);
+      border: none;
+      border-radius: 15px;
+      color: #111;
+      cursor: pointer;
+      font-weight: 800;
+      box-shadow: 0 0 30px rgba(254, 210, 1, 0.4);
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    #restartBtn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0 40px rgba(254, 210, 1, 0.6);
+      background: linear-gradient(45deg, #ffd700, #FED201);
+    }
+
+    /* Overlay Elements */
+    #countdownText {
+      font-size: 72px;
+      font-weight: bold;
+      color: #FED201;
+      text-shadow: 0 0 20px rgba(254, 210, 1, 0.5);
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1000;
+      display: none;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: translate(-50%, -50%) scale(1); }
+      50% { transform: translate(-50%, -50%) scale(1.2); }
+      100% { transform: translate(-50%, -50%) scale(1); }
+    }
+
+    #result {
+      font-size: 5rem;
+      font-weight: 900;
+      color: #FED201;
+      text-shadow: 0 0 30px rgba(254, 210, 1, 0.6);
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 4;
+      background: rgba(0, 0, 0, 0.9);
+      padding: 40px 80px;
+      border-radius: 40px;
+      border: 4px solid #FED201;
+      white-space: nowrap;
+      box-shadow: 0 0 60px rgba(254, 210, 1, 0.4);
+    }
+
+    .combo-text {
+      position: absolute;
+      font-size: 36px;
+      font-weight: bold;
+      color: #FED201;
+      text-shadow: 0 0 10px rgba(254, 210, 1, 0.5);
+      transition: all 0.3s ease;
+      opacity: 0;
+      transform: scale(0.5);
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    #comboTextA {
+      font-size: 70px;
+      top: 5px;
+    }
+
+    #comboTextB {
+      font-size: 70px;
+      top: 5px;
+    }
+
+    .combo-text.active {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .player-a .combo-text {
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .player-b .combo-text {
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .punch-flash {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(254, 210, 1, 0.4);
+      pointer-events: none;
+      z-index: 10;
+      animation: flash 0.3s;
+    }
+
+    @keyframes flash {
+      0% { opacity: 0.8; }
+      100% { opacity: 0; }
+    }
+
+    @keyframes result-pop {
+      0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+      50% { transform: translate(-50%, -50%) scale(1.1); }
+      100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    }
+
+    .player.punched {
+      animation: shake 0.5s;
+    }
+
+    @keyframes shake {
+      0% { transform: translateX(0) rotate(0); }
+      25% { transform: translateX(-10px) rotate(-2deg); }
+      50% { transform: translateX(10px) rotate(2deg); }
+      75% { transform: translateX(-10px) rotate(-2deg); }
+      100% { transform: translateX(0) rotate(0); }
+    }
+
+    /* เพิ่ม styles สำหรับปุ่มและระบบเลือด */
+    .game-btn {
+      font-size: 1.8rem;
+      padding: 15px 40px;
+      background: linear-gradient(45deg, #FED201, #ffd700);
+      border: none;
+      border-radius: 15px;
+      color: #111;
+      cursor: pointer;
+      font-weight: 800;
+      box-shadow: 0 0 30px rgba(254, 210, 1, 0.4);
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin: 0 10px;
+    }
+
+    .game-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0 40px rgba(254, 210, 1, 0.6);
+      background: linear-gradient(45deg, #ffd700, #FED201);
+    }
+
+    .score, .combo {
+      font-size: 1.2rem;
+      color: #FED201;
+      font-weight: 700;
+      text-shadow: 0 0 10px rgba(254, 210, 1, 0.5);
+      margin-top: 5px;
+    }
+
+    .health-container {
+      width: 300px;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 15px;
+      border-radius: 15px;
+      border: 2px solid #FED201;
+    }
+
+    .health-bar {
+      background: rgba(51, 51, 51, 0.8);
+      height: 25px;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+      border: 2px solid #FED201;
+      position: relative;
+      margin-bottom: 10px;
+    }
+
+    .health {
+      height: 100%;
+      transition: width 0.3s ease;
+      border-radius: 15px 0 0 15px;
+    }
+
+    #healthA {
+      background: linear-gradient(90deg, #FED201, #ff6b6b);
+      box-shadow: 0 0 30px rgba(254, 210, 1, 0.4);
+    }
+
+    #healthB {
+      background: linear-gradient(90deg, #FED201, #4dabf7);
+      box-shadow: 0 0 30px rgba(254, 210, 1, 0.4);
+      border-radius: 15px 0 0 15px;
+    }
+
+    .health-value {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #fff;
+      font-weight: 700;
+      text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+    }
+
+    .combo-text.active {
+      animation: combo-pop 0.5s;
+    }
+
+    @keyframes combo-pop {
+      0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+      50% { transform: translate(-50%, -50%) scale(1.2); }
+      100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    }
+  </style>
+
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 </head>
 <body>
+<div id="qr-section">
+  <h2>ผู้เล่นคนที่ <span id="player-number">1</span> กรุณาสแกน QR Code</h2>
+  <div id="qr-reader"></div>
+  <div id="qr-result"></div>
+</div>
 
-<h2>เปิดกล้องถ่ายรูป</h2>
-<video id="video" autoplay playsinline></video><br />
-<button id="snap">ถ่ายรูป</button>
-<canvas id="canvas" style="display:none;"></canvas>
-<img id="photo" alt="ภาพถ่ายจะปรากฏที่นี่" />
+<div id="photo-section">
+  <h2>ถ่ายรูปผู้เล่นคนที่ <span id="player-number-photo">1</span></h2>
+  <video id="video" autoplay playsinline></video><br/>
+  <button id="snap">ถ่ายรูป</button>
+  <canvas id="canvas" style="display:none;"></canvas>
+  <div>
+    <img id="photo" alt="รูปที่ถ่าย" />
+  </div>
+  <button id="nextBtn" style="display:none;">ถัดไป</button>
+  <button id="retakeBtn" style="display:none; margin-left:10px;">ถ่ายใหม่</button>
+
+</div>
+<div id="game-section">
+  <div class="game">
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <div class="player-info">
+        <img id="player1-photo" class="player-avatar" alt="Player A" src="" />
+        <div class="player-details">
+          <div class="player-name">Player A</div>
+          <div class="player-qr" id="player1-qr">-</div>
+        </div>
+        <div class="health-container">
+          <div class="health-bar">
+            <div id="healthA" class="health-fill" style="width:100%;"></div>
+            <div class="health-value" id="healthAValue">100%</div>
+          </div>
+
+        </div>
+      </div>
+
+      <div id="timer">60</div>
+
+      <div class="player-info" style="flex-direction: row-reverse;">
+        <img id="player2-photo" class="player-avatar" alt="Player B" src="" />
+        <div class="player-details" style="text-align: right;">
+          <div class="player-name">Player B</div>
+          <div class="player-qr" id="player2-qr">-</div>
+        </div>
+        <div class="health-container">
+          <div class="health-bar">
+            <div id="healthB" class="health-fill" style="width:100%;"></div>
+            <div class="health-value" id="healthBValue">100%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Arena Section -->
+    <div class="arena-section">
+      <div class="arena-frame">
+        <div class="player-a" style="cursor: pointer; width: 700px; height: 700px; display: flex; justify-content: center; align-items: center;">
+          <img id="arena-blue" src="blue1.png" alt="Blue Fighter" style="width: 100%; height: 100%; object-fit: contain;" />
+          <div id="comboTextB" class="combo-text"></div>
+        </div>
+        <div class="player-b" style="cursor: pointer; width: 700px; height: 700px; display: flex; justify-content: center; align-items: center;">
+          <img id="arena-red" src="red1.png" alt="Red Fighter" style="width: 100%; height: 100%; object-fit: contain;" />
+          <div id="comboTextA" class="combo-text"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="bottom-bar">
+      <button id="restartBtn" class="game-btn">เริ่มเกม</button>
+      <button id="restartRegisterBtn" class="game-btn" onclick="restartRegister()">ลงทะเบียนใหม่</button>
+    </div>
+  </div>
+
+  <div id="countdownText"></div>
+  <div id="result"></div>
+  <div class="player-a">
+    <div class="player-info">
+        <div class="player-name">Player A</div>
+    </div>
+    <div id="comboTextA" class="combo-text"></div>
+  </div>
+
+  <div class="player-b">
+    <div class="player-info">
+        <div class="player-name">Player B</div>
+    </div>
+    <div id="comboTextB" class="combo-text"></div>
+  </div>
+</div>
 
 <script>
-  const video = document.getElementById('video');
-  const canvas = document.getElementById('canvas');
-  const photo = document.getElementById('photo');
-  const snap = document.getElementById('snap');
+// ตัวแปรเก็บข้อมูลผู้เล่น
+const players = [
+  { qrData: null, photoDataUrl: null },
+  { qrData: null, photoDataUrl: null }
+];
+let currentPlayerIndex = 0;
+let cameraStream = null;
+let html5QrCode = null;
+let gameInterval;
+let timeLeft = 60;
+let isGameActive = false;
+let isCountdownFinished = false;
+let healthA = 100;
+let healthB = 100;
+let comboA = 0;
+let comboB = 0;
+let pressedKeys = {};
+const maxHealth = 100;
 
-  // ขออนุญาตใช้กล้อง
-  navigator.mediaDevices.getUserMedia({ video: true })
-    .then(stream => {
-      video.srcObject = stream;
-    })
-    .catch(err => {
-      alert('ไม่สามารถเปิดกล้องได้: ' + err);
-      console.error(err);
+// ส่วนต่างๆ ของ DOM
+const qrSection = document.getElementById('qr-section');
+const photoSection = document.getElementById('photo-section');
+const gameSection = document.getElementById('game-section');
+
+const playerNumberSpan = document.getElementById('player-number');
+const playerNumberPhotoSpan = document.getElementById('player-number-photo');
+const qrResultDiv = document.getElementById('qr-result');
+
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const photo = document.getElementById('photo');
+const snapBtn = document.getElementById('snap');
+const nextBtn = document.getElementById('nextBtn');
+const retakeBtn = document.getElementById('retakeBtn');
+
+// ฟังก์ชันเริ่มกล้อง
+async function startCamera() {
+  if (cameraStream) {
+    video.srcObject = cameraStream;
+    return;
+  }
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ 
+      video: { 
+        facingMode: "environment",
+        width: { ideal: 1280 },
+        height: { ideal: 720 }
+      } 
     });
+    cameraStream = stream;
+    video.srcObject = stream;
+  } catch (err) {
+    alert('ไม่สามารถเข้าถึงกล้องได้: ' + err);
+  }
+}
 
-  snap.addEventListener('click', () => {
-    const context = canvas.getContext('2d');
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-    // แสดงภาพถ่ายจาก canvas
-    photo.src = canvas.toDataURL('image/png');
+// แสดงส่วน QR scan
+function showQRSection() {
+  qrSection.style.display = 'block';
+  photoSection.style.display = 'none';
+  gameSection.style.display = 'none';
+  playerNumberSpan.textContent = currentPlayerIndex + 1;
+}
+
+// แสดงถ่ายรูป section
+function showPhotoSection() {
+  qrSection.style.display = 'none';
+  photoSection.style.display = 'block';
+  gameSection.style.display = 'none';
+  playerNumberPhotoSpan.textContent = currentPlayerIndex + 1;
+
+  if (!cameraStream) {
+    startCamera();
+  } else {
+    video.srcObject = cameraStream;
+  }
+  
+  video.style.display = 'block';
+  photo.style.display = 'none';
+  snapBtn.style.display = 'inline-block';
+  nextBtn.style.display = 'none';
+  retakeBtn.style.display = 'none';
+}
+
+// แสดงเกม section
+function showGameSection() {
+  qrSection.style.display = 'none';
+  photoSection.style.display = 'none';
+  gameSection.style.display = 'block';
+  
+  // รีเซ็ตค่าเลือดและ combo
+  healthA = 100;
+  healthB = 100;
+  comboA = 0;
+  comboB = 0;
+  updateHealth();
+}
+
+// เริ่มต้นแสดงหน้า QR scan
+showQRSection();
+
+// สแกน QR code ด้วย html5-qrcode
+if (!html5QrCode) {
+  html5QrCode = new Html5Qrcode("qr-reader");
+}
+
+function startScanning() {
+  if (html5QrCode.isScanning) {
+    return;
+  }
+
+  html5QrCode.start(
+    { facingMode: "environment" },
+    { 
+      fps: 30,
+      qrbox: { width: 600, height: 600 },
+      aspectRatio: 1.0
+    },
+    qrCodeMessage => {
+      html5QrCode.stop();
+
+      try {
+        const qrObject = JSON.parse(qrCodeMessage);
+        const name = qrObject.name || "ไม่พบชื่อ";
+        qrResultDiv.textContent = `พบชื่อ: ${name}`;
+        players[currentPlayerIndex].qrData = name;
+      } catch (e) {
+        qrResultDiv.textContent = `ข้อมูลไม่ถูกต้อง: ${qrCodeMessage}`;
+        players[currentPlayerIndex].qrData = qrCodeMessage;
+      }
+
+      setTimeout(() => {
+        showPhotoSection();
+      }, 500);
+    },
+    errorMessage => {
+      // ignore scan errors
+    }
+  ).catch(err => {
+    alert('ไม่สามารถเริ่มสแกน QR code ได้: ' + err);
   });
+}
+
+startScanning();
+
+// ถ่ายรูป
+snapBtn.addEventListener('click', () => {
+  const context = canvas.getContext('2d');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+  const dataUrl = canvas.toDataURL('image/png');
+  photo.src = dataUrl;
+  players[currentPlayerIndex].photoDataUrl = dataUrl;
+
+  video.style.display = 'none';
+  snapBtn.style.display = 'none';
+  photo.style.display = 'block';
+  nextBtn.style.display = 'inline-block';
+  retakeBtn.style.display = 'inline-block';
+});
+
+// ปุ่มถ่ายใหม่ (Retake)
+retakeBtn.addEventListener('click', () => {
+  video.style.display = 'block';
+  photo.style.display = 'none';
+  snapBtn.style.display = 'inline-block';
+  nextBtn.style.display = 'none';
+  retakeBtn.style.display = 'none';
+});
+
+// ปุ่มถัดไป หลังถ่ายรูป
+nextBtn.addEventListener('click', () => {
+  currentPlayerIndex++;
+  if (currentPlayerIndex < players.length) {
+    qrResultDiv.textContent = '';
+    photo.src = '';
+    showQRSection();
+    startScanning();
+  } else {
+    alert('สแกนและถ่ายรูปครบ 2 คนแล้ว! เริ่มเกมได้เลย');
+    showGameSection();
+    displayPlayersInfo();
+    initGame();
+  }
+});
+
+// แสดงข้อมูลผู้เล่น
+function displayPlayersInfo() {
+  document.getElementById('player1-qr').textContent = players[0].qrData || '-';
+  document.getElementById('player2-qr').textContent = players[1].qrData || '-';
+
+  document.getElementById('player1-photo').src = players[0].photoDataUrl || '';
+  document.getElementById('player2-photo').src = players[1].photoDataUrl || '';
+}
+
+// --------- โค้ดเกม ---------
+let lastHitTimeA = 0;
+let lastHitTimeB = 0;
+const COMBO_TIMEOUT = 1800; // 1.8 วินาที combo window
+let timerStarted = false;
+let gameEnded = false;
+let countdown;
+let firstPlay = true;
+let countdownInterval;
+
+const timerDisplay = document.getElementById('timer');
+const resultDisplay = document.getElementById('result');
+const healthAValue = document.getElementById('healthAValue');
+const healthBValue = document.getElementById('healthBValue');
+const healthABar = document.getElementById('healthA');
+const healthBBar = document.getElementById('healthB');
+const scoreADisplay = document.getElementById('scoreA');
+const scoreBDisplay = document.getElementById('scoreB');
+const comboADisplay = document.getElementById('comboA');
+const comboBDisplay = document.getElementById('comboB');
+const comboTextA = document.getElementById('comboTextA');
+const comboTextB = document.getElementById('comboTextB');
+const playerA = document.getElementById('playerA');
+const playerB = document.getElementById('playerB');
+const restartBtn = document.getElementById('restartBtn');
+const restartRegisterBtn = document.getElementById('restartRegisterBtn');
+const countdownText = document.getElementById('countdownText');
+
+const player1StandImg = document.getElementById('player1-stand');
+const player2StandImg = document.getElementById('player2-stand');
+
+const arenaBlue = document.getElementById('arena-blue');
+const arenaRed = document.getElementById('arena-red');
+const player1Photo = document.getElementById('player1-photo');
+const player2Photo = document.getElementById('player2-photo');
+
+function showArenaAction(player, action) {
+  if (player === 'A') {
+    if (action === 'punch') {
+      arenaBlue.src = 'blue2.png';
+      setTimeout(() => { arenaBlue.src = 'blue1.png'; }, 350);
+    } else {
+      arenaBlue.src = 'blue1.png';
+    }
+  } else if (player === 'B') {
+    if (action === 'punch') {
+      arenaRed.src = 'red2.png';
+      setTimeout(() => { arenaRed.src = 'red1.png'; }, 350);
+    } else {
+      arenaRed.src = 'red1.png';
+    }
+  }
+}
+
+function createPunchEffect(x, y) {
+  const effect = document.createElement('div');
+  effect.className = 'punch-effect';
+  effect.style.left = x + 'px';
+  effect.style.top = y + 'px';
+  return effect;
+}
+
+function updateHealth() {
+  healthABar.style.width = healthA + '%';
+  healthBBar.style.width = healthB + '%';
+  healthAValue.textContent = Math.max(0, Math.round(healthA));
+  healthBValue.textContent = Math.max(0, Math.round(healthB));
+}
+
+function endGame() {
+    isGameActive = false;
+    if (gameInterval) {
+        clearInterval(gameInterval);
+        gameInterval = null;
+    }
+    if (countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+    }
+    
+    // รีเซ็ตสถานะการกดปุ่ม
+    pressedKeys = {};
+    
+    let result = '';
+    if (healthA <= 0) {
+        result = 'Player B Wins!';
+    } else if (healthB <= 0) {
+        result = 'Player A Wins!';
+    } else {
+        result = healthA > healthB ? 'Player A Wins!' : 'Player B Wins!';
+    }
+    
+    const resultElement = document.getElementById('result');
+    resultElement.textContent = result;
+    resultElement.style.display = 'block';
+    
+    document.getElementById('restartBtn').style.display = 'inline-block';
+    document.getElementById('restartRegisterBtn').style.display = 'inline';
+    document.getElementById('restartBtn').textContent = "เริ่มเกมใหม่";
+}
+
+function checkWinCondition() {
+  if (healthB <= 0) {
+    endGame("🎉 Player A ชนะ! โค่น Player B ลงได้!");
+  } else if (healthA <= 0) {
+    endGame("🎉 Player B ชนะ! โค่น Player A ลงได้!");
+  }
+}
+
+function startTimer() {
+  timerStarted = true;
+  countdown = setInterval(() => {
+    timeLeft--;
+    timerDisplay.textContent = timeLeft;
+    if (timeLeft <= 0 && !gameEnded) {
+      if (healthA > healthB) {
+        endGame("🎉 Player A ชนะ! เหลือพลังชีวิตมากกว่า!");
+      } else if (healthB > healthA) {
+        endGame("🎉 Player B ชนะ! เหลือพลังชีวิตมากกว่า!");
+      } else {
+        endGame("🤝 เสมอกัน!");
+      }
+    }
+  }, 1000);
+}
+
+function handleKeyDown(event) {
+    if (!isGameActive || !isCountdownFinished) return;
+    
+    const key = event.key.toLowerCase();
+    if (pressedKeys[key]) return;
+    const now = Date.now();
+    
+    if (key === 'a') {
+        pressedKeys['a'] = true;
+        const damage = 1;
+        healthB = Math.max(0, healthB - damage);
+        updateCombo('A', now);
+        showArenaAction('A', 'punch');
+        updateHealth();
+        checkGameEnd();
+    } else if (key === 'l') {
+        pressedKeys['l'] = true;
+        const damage = 1;
+        healthA = Math.max(0, healthA - damage);
+        updateCombo('B', now);
+        showArenaAction('B', 'punch');
+        updateHealth();
+        checkGameEnd();
+    }
+}
+
+function handleKeyUp(event) {
+    if (!isGameActive) return;
+    
+    const key = event.key.toLowerCase();
+    if (key === 'a' || key === 'l') {
+        pressedKeys[key] = false;
+    }
+}
+
+function startCountdownThenGame() {
+  let count = 3;
+  countdownText.textContent = count;
+  restartBtn.style.display = "none";
+  restartRegisterBtn.style.display = "none";
+  document.removeEventListener('keydown', handleKeyDown);
+  document.removeEventListener('keyup', handleKeyUp);
+
+  countdownInterval = setInterval(() => {
+    count--;
+    if (count > 0) {
+      countdownText.textContent = count;
+    } else if (count === 0) {
+      countdownText.textContent = "Go!";
+    } else {
+      clearInterval(countdownInterval);
+      countdownText.textContent = "";
+      startTimer();
+      document.addEventListener('keydown', handleKeyDown);
+      document.addEventListener('keyup', handleKeyUp);
+    }
+  }, 1000);
+}
+
+function resetGame() {
+    // ล้าง interval เก่า (ถ้ามี)
+    if (gameInterval) {
+        clearInterval(gameInterval);
+        gameInterval = null;
+    }
+    if (countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+    }
+    
+    healthA = 100;
+    healthB = 100;
+    comboA = 0;
+    comboB = 0;
+    timeLeft = 60;
+    isGameActive = false;
+    isCountdownFinished = false;
+    pressedKeys = {};
+    
+    updateHealth();
+    showArenaAction('A', 'stand');
+    showArenaAction('B', 'stand');
+    
+    const resultElement = document.getElementById('result');
+    resultElement.textContent = "";
+    resultElement.style.display = 'none';
+    
+    const countdownElement = document.getElementById('countdownText');
+    countdownElement.style.display = 'none';
+    countdownElement.textContent = "3"; // รีเซ็ตตัวเลขเป็น 3
+    
+    const timerDisplay = document.getElementById('timer');
+    timerDisplay.textContent = "60";
+    
+    document.getElementById('restartBtn').style.display = 'inline-block';
+    document.getElementById('restartRegisterBtn').style.display = 'inline';
+    document.getElementById('restartBtn').textContent = "เริ่มเกมใหม่";
+}
+
+restartBtn.addEventListener('click', () => {
+    resetGame();
+    startGame();
+});
+
+function restartRegister() {
+  // รีโหลดหน้าเว็บ
+  location.reload();
+}
+
+function showCombo(player, count) {
+    const comboText = document.getElementById(`comboText${player}`);
+    if (!comboText) return;
+
+    comboText.textContent = '';
+    comboText.style.opacity = '0';
+    comboText.style.transform = 'scale(0.5)';
+
+    if (count > 1) {
+        comboText.textContent = `${count} COMBO!`;
+        comboText.style.transition = 'none';
+        void comboText.offsetWidth;
+        comboText.style.transition = 'all 0.3s ease';
+        comboText.style.opacity = '1';
+        comboText.style.transform = 'scale(1)';
+        setTimeout(() => {
+            comboText.style.opacity = '0';
+            comboText.style.transform = 'scale(0.5)';
+        }, 1000);
+    }
+}
+
+function updateCombo(player, currentTime) {
+  if (player === 'A') {
+    if (currentTime - lastHitTimeA < COMBO_TIMEOUT) {
+      comboA++;
+    } else {
+      comboA = 1;
+    }
+    lastHitTimeA = currentTime;
+    if (comboA > 1) {
+      showCombo('A', comboA);
+    }
+  } else {
+    if (currentTime - lastHitTimeB < COMBO_TIMEOUT) {
+      comboB++;
+    } else {
+      comboB = 1;
+    }
+    lastHitTimeB = currentTime;
+    if (comboB > 1) {
+      showCombo('B', comboB);
+    }
+  }
+}
+
+function initGame() {
+  resetGame();
+}
+
+// Add event listeners for player actions
+document.addEventListener('DOMContentLoaded', () => {
+    // Event listeners สำหรับการโจมตี
+    const playerA = document.querySelector('.player-a');
+    const playerB = document.querySelector('.player-b');
+    
+    if (playerA) {
+        playerA.addEventListener('click', () => {
+            if (isGameActive && isCountdownFinished && !pressedKeys['a']) {
+                pressedKeys['a'] = true;
+                const damage = 1;
+                healthB = Math.max(0, healthB - damage);
+                const now = Date.now();
+                updateCombo('A', now);
+                showArenaAction('A', 'punch');
+                updateHealth();
+                checkGameEnd();
+                setTimeout(() => { pressedKeys['a'] = false; }, 100);
+            }
+        });
+    }
+    
+    if (playerB) {
+        playerB.addEventListener('click', () => {
+            if (isGameActive && isCountdownFinished && !pressedKeys['l']) {
+                pressedKeys['l'] = true;
+                const damage = 1;
+                healthA = Math.max(0, healthA - damage);
+                const now = Date.now();
+                updateCombo('B', now);
+                showArenaAction('B', 'punch');
+                updateHealth();
+                checkGameEnd();
+                setTimeout(() => { pressedKeys['l'] = false; }, 100);
+            }
+        });
+    }
+    
+    // Event listener สำหรับปุ่มเริ่มเกม
+    const restartBtn = document.getElementById('restartBtn');
+    if (restartBtn) {
+        restartBtn.addEventListener('click', () => {
+            resetGame();
+            startGame();
+        });
+    }
+    
+    // เพิ่ม event listeners สำหรับปุ่ม
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keyup', handleKeyUp);
+});
+
+function punch(player) {
+    console.log('Punch function called for player:', player);
+    if (!isGameActive) {
+        console.log('Game is not active');
+        return;
+    }
+    
+    const damage = Math.floor(Math.random() * 10) + 5;
+    console.log('Damage dealt:', damage);
+    
+    if (player === 'A') {
+        healthB = Math.max(0, healthB - damage);
+        comboA++;
+        comboB = 0;
+        console.log('Player A attacks. Health B:', healthB, 'Combo A:', comboA);
+        showCombo('A', comboA);
+        showArenaAction('A', 'punch');
+    } else {
+        healthA = Math.max(0, healthA - damage);
+        comboB++;
+        comboA = 0;
+        console.log('Player B attacks. Health A:', healthA, 'Combo B:', comboB);
+        showCombo('B', comboB);
+        showArenaAction('B', 'punch');
+    }
+    
+    updateHealth();
+    checkGameEnd();
+}
+
+function checkGameEnd() {
+    if (healthA <= 0 || healthB <= 0 || timeLeft <= 0) {
+        endGame();
+    }
+}
+
+function startGame() {
+    if (isGameActive) return;
+    
+    // ล้าง interval เก่า (ถ้ามี)
+    if (gameInterval) {
+        clearInterval(gameInterval);
+        gameInterval = null;
+    }
+    if (countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+    }
+    
+    isGameActive = true;
+    isCountdownFinished = false;
+    document.getElementById('restartBtn').style.display = 'none';
+    document.getElementById('result').style.display = 'none';
+    document.getElementById('restartRegisterBtn').style.display = 'none';
+    
+    // รีเซ็ตค่าเลือดและ combo
+    healthA = 100;
+    healthB = 100;
+    comboA = 0;
+    comboB = 0;
+    updateHealth();
+    
+    // เริ่มนับถอยหลัง
+    let count = 3;
+    const countdownElement = document.getElementById('countdownText');
+    countdownElement.style.display = 'block';
+    countdownElement.textContent = count; // แสดง 3 ตั้งแต่เริ่มต้น
+    
+    countdownInterval = setInterval(() => {
+        count--;
+        if (count > 0) {
+            countdownElement.textContent = count;
+        } else if (count === 0) {
+            countdownElement.textContent = "Go!";
+        } else {
+            clearInterval(countdownInterval);
+            countdownInterval = null;
+            countdownElement.style.display = 'none';
+            isCountdownFinished = true;
+            startGameTimer();
+        }
+    }, 1000);
+}
+
+function updateTimer() {
+    if (timeLeft < 0) {
+        timeLeft = 0;
+    }
+    document.getElementById('timer').textContent = timeLeft;
+}
+
+function startGameTimer() {
+    timeLeft = 60;
+    updateTimer();
+    
+    gameInterval = setInterval(() => {
+        if (timeLeft > 0) {
+            timeLeft--;
+            updateTimer();
+        } else {
+            clearInterval(gameInterval);
+            endGame();
+        }
+    }, 1000);
+}
+
+// แสดงการกระทำในสนาม
+function showArenaAction(player, action) {
+    console.log('Showing arena action for player:', player, 'action:', action);
+    if (player === 'A') {
+        const arenaBlue = document.getElementById('arena-blue');
+        if (arenaBlue) {
+            if (action === 'punch') {
+                arenaBlue.src = 'blue2.png';
+                setTimeout(() => { arenaBlue.src = 'blue1.png'; }, 350);
+            } else {
+                arenaBlue.src = 'blue1.png';
+            }
+        }
+    } else if (player === 'B') {
+        const arenaRed = document.getElementById('arena-red');
+        if (arenaRed) {
+            if (action === 'punch') {
+                arenaRed.src = 'red2.png';
+                setTimeout(() => { arenaRed.src = 'red1.png'; }, 350);
+            } else {
+                arenaRed.src = 'red1.png';
+            }
+        }
+    }
+}
+
+// เพิ่ม event listeners
+document.addEventListener('DOMContentLoaded', () => {
+    // Event listeners สำหรับการโจมตี
+    const playerA = document.querySelector('.player-a');
+    const playerB = document.querySelector('.player-b');
+    
+    if (playerA) {
+        playerA.addEventListener('click', () => {
+            if (isGameActive && isCountdownFinished && !pressedKeys['a']) {
+                pressedKeys['a'] = true;
+                const damage = 1;
+                healthB = Math.max(0, healthB - damage);
+                const now = Date.now();
+                updateCombo('A', now);
+                showArenaAction('A', 'punch');
+                updateHealth();
+                checkGameEnd();
+                setTimeout(() => { pressedKeys['a'] = false; }, 100);
+            }
+        });
+    }
+    
+    if (playerB) {
+        playerB.addEventListener('click', () => {
+            if (isGameActive && isCountdownFinished && !pressedKeys['l']) {
+                pressedKeys['l'] = true;
+                const damage = 1;
+                healthA = Math.max(0, healthA - damage);
+                const now = Date.now();
+                updateCombo('B', now);
+                showArenaAction('B', 'punch');
+                updateHealth();
+                checkGameEnd();
+                setTimeout(() => { pressedKeys['l'] = false; }, 100);
+            }
+        });
+    }
+    
+    // Event listener สำหรับปุ่มเริ่มเกม
+    const restartBtn = document.getElementById('restartBtn');
+    if (restartBtn) {
+        restartBtn.addEventListener('click', () => {
+            resetGame();
+            startGame();
+        });
+    }
+});
 </script>
+
 
 </body>
 </html>
