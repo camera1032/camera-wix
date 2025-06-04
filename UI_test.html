@@ -24,7 +24,6 @@
     h1, h2, h3 {
       font-weight: 800;
       color: #FED201;
-      text-shadow: 0 0 10px #FED201, 0 0 20px #FED201;
       margin-bottom: 12px;
       letter-spacing: 1px; 
     }
@@ -199,7 +198,7 @@
       justify-content: space-between;
       align-items: center;
       padding: 20px 40px;
-      background: rgba(0, 0, 0, 0.8);
+      background: rgba(0, 0, 0);
       border-bottom: 3px solid #FED201;
       box-shadow: 0 5px 30px rgba(254, 210, 1, 0.3);
     }
@@ -596,7 +595,7 @@
       <div class="player-info">
         <img id="player1-photo" class="player-avatar" alt="Player A" src="" />
         <div class="player-details">
-          <div class="player-name">Player A</div>
+          <div class="player-name" style="color: blue;">Player A</div>
           <div class="player-qr" id="player1-qr">-</div>
         </div>
         <div class="health-container">
@@ -613,7 +612,7 @@
       <div class="player-info" style="flex-direction: row-reverse;">
         <img id="player2-photo" class="player-avatar" alt="Player B" src="" />
         <div class="player-details" style="text-align: right;">
-          <div class="player-name">Player B</div>
+          <div class="player-name" style="color: red;">Player B</div>
           <div class="player-qr" id="player2-qr">-</div>
         </div>
         <div class="health-container">
@@ -630,11 +629,11 @@
       <div class="arena-frame">
         <div class="player-a" style="cursor: pointer; width: 700px; height: 700px; display: flex; justify-content: center; align-items: center;">
           <img id="arena-blue" src="blue1.png" alt="Blue Fighter" style="width: 100%; height: 100%; object-fit: contain;" />
-          <div id="comboTextB" class="combo-text"></div>
+          <div id="comboTextB" class="combo-text" style="color: red;"></div>
         </div>
         <div class="player-b" style="cursor: pointer; width: 700px; height: 700px; display: flex; justify-content: center; align-items: center;">
           <img id="arena-red" src="red1.png" alt="Red Fighter" style="width: 100%; height: 100%; object-fit: contain;" />
-          <div id="comboTextA" class="combo-text"></div>
+          <div id="comboTextA" class="combo-text" style="color: blue;"></div>
         </div>
       </div>
     </div>
